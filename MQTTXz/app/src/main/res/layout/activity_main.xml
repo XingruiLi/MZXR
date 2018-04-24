@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/linearlayout"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    tools:context="com.example.a40782.mqtt.MainActivity">
+
+
+    <TextView
+        android:id="@+id/djzt_title"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="60dp"
+        android:text="电机状态"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:textSize="25dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <ImageView
+        android:id="@+id/round_imageView"
+        android:layout_width="35dp"
+        android:layout_height="35dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="68dp"
+        android:background="@drawable/circle_red"
+        android:scaleType="centerInside"
+        app:layout_constraintStart_toEndOf="@+id/djzt_title"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/djfx_title"
+        android:layout_width="wrap_content"
+        android:layout_height="34dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
+        android:text="电机方向"
+        android:textSize="25dp"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/djzt_title" />
+
+    <TextView
+        android:id="@+id/djfx_value"
+        android:layout_width="260dp"
+        android:layout_height="34dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="27dp"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:textSize="19dp"
+        app:layout_constraintLeft_toRightOf="@id/djfx_title"
+        app:layout_constraintTop_toBottomOf="@id/round_imageView" />
+
+
+    <TextView
+        android:id="@+id/djzs_title"
+        android:layout_width="wrap_content"
+        android:layout_height="34dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
+        android:text="电机转速"
+        android:textSize="25dp"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/djfx_title" />
+
+    <TextView
+        android:id="@+id/djzs_value"
+        android:layout_width="260dp"
+        android:layout_height="34dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="10dp"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:textSize="19dp"
+        app:layout_constraintLeft_toRightOf="@id/djzs_title"
+
+        app:layout_constraintTop_toBottomOf="@id/djfx_value" />
+
+
+    <TextView
+        android:id="@+id/sbsj_title"
+        android:layout_width="wrap_content"
+        android:layout_height="34dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="10dp"
+        android:text="上报时间"
+        android:textSize="25dp"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/djzs_title" />
+
+    <TextView
+        android:id="@+id/sbsj_value"
+        android:layout_width="260dp"
+        android:layout_height="34dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="13dp"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:textSize="16dp"
+        app:layout_constraintLeft_toRightOf="@id/sbsj_title"
+        app:layout_constraintTop_toBottomOf="@id/djzs_value" />
+
+
+    <Button
+        android:id="@+id/connect"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="连接"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.952"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <Button
+        android:id="@+id/button_publish"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="发布"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/connect"
+        app:layout_constraintHorizontal_bias="0.269"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/xgzs_title"
+        android:layout_width="wrap_content"
+        android:layout_height="31dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="50dp"
+        android:text="修改转速"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:textSize="25dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sbsj_value" />
+
+    <com.warkiz.widget.IndicatorSeekBar
+        android:id="@+id/seekBar"
+        style="@style/CustomSeekbarStyle"
+        android:layout_width="200dp"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="72dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="72dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="57dp"
+        android:progress="20"
+        android:scrollbarSize="5dp"
+        app:isb_max="500"
+        app:isb_min="200"
+        app:isb_seek_bar_type="continuous"
+        app:isb_thumb_progress_stay="true"
+        app:isb_track_rounded_corners="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/sbsj_title"
+        app:layout_constraintTop_toBottomOf="@+id/sbsj_value" />
+
+    <TextView
+        android:id="@+id/djqt_title"
+        android:layout_width="wrap_content"
+        android:layout_height="31dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="50dp"
+        android:text="电机启停"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:textSize="25dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/xgzs_title" />
+
+    <Switch
+        android:id="@+id/djqt_sw"
+        android:layout_width="60dp"
+        android:layout_height="45dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="35dp"
+        android:thumb="@drawable/selector_thumb"
+        android:track="@drawable/selector_track"
+        app:layout_constraintStart_toEndOf="@+id/djqt_title"
+        app:layout_constraintTop_toBottomOf="@+id/seekBar" />
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:elevation="4dp"
+        android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"/>
+    />
+
+
+</android.support.constraint.ConstraintLayout>
