@@ -1,6 +1,7 @@
 package com.example.a40782.mqtt;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -10,6 +11,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.Switch;
@@ -19,6 +21,9 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONException;
 import com.alibaba.fastjson.JSONObject;
+import com.lzy.okgo.OkGo;
+import com.lzy.okgo.callback.StringCallback;
+import com.lzy.okgo.model.Response;
 import com.warkiz.widget.IndicatorSeekBar;
 
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
@@ -29,13 +34,15 @@ import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
-import java.util.LinkedHashMap;
+import java.lang.ref.WeakReference;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends Activity {
 
+    private static final String TAG = "TestTag";
+    public MessageToServer messageToServer;
     private ImageView djzt_t;
     private TextView sbsj_t;
     private TextView djzs_t;
@@ -49,7 +56,7 @@ public class MainActivity extends Activity {
     private String userName = "wjserver01/device01";
     private String passWord = "ude+5Fo/HtdsR/+Ez+Pp8hnXDCSb9NPd+Rg92HK1Gmg=";
     private Button PubButton;
-    private Handler handler;
+    private Handler handler = new MyHandler(this);
     private IndicatorSeekBar djzs_bar;
     private MqttClient client;
     private String sbsj = "0";
@@ -60,74 +67,40 @@ public class MainActivity extends Activity {
     private String myTopic = "WJ/V1/GAT/TCP/R/J/CT/TID01I0FA";
     private Vibrator mVibrator;
     private MqttConnectOptions options;
-
     private ScheduledExecutorService scheduler;
-
-    private static final String TAG = "TestTag";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //SERVER
+        // messageToServer = new MessageToServer(((MyApp)getApplication()).getUrl());
 
         initview();
 
         init();
-        handler = new Handler() {
-            @Override
-            public void handleMessage(Message msg) {
-                super.handleMessage(msg);
-                if (msg.what == 1) {
-                    JSONObject message = JSON.parseObject((String) msg.obj);
-                    try {
-                        if (message != null) {
-                            sbsj = message.getString("sbsj");
-                            //System.out.println(sbsj);
-                            if (sbsj != null) {
-                                sbsj = sbsj.substring(0, 4) + "年" + sbsj.substring(4, 6) + "月" + sbsj.substring(6, 8) + "日"
-                                        + sbsj.substring(8, 10) + "时" + sbsj.substring(10, 12) + "分" + sbsj.substring(12, 14) + "秒";
-                                sbsj_t.setText(sbsj);}
-                            }
-
-                    }
-                    catch(JSONException e)
-                    {e.printStackTrace();
-                    }
-//                    String message = (String) msg.obj;
-//                    MqttPacketModel xxs = MqttMsgHeader.MqttMsgHeaderPasre(myTopic, message.getBytes());
-//                    String receive = new String(xxs.mPayload);
-//                    if (xxs != null) {
-//                        msg.obj = new String(xxs.mPayload);
-//                        System.out.println(msg.obj + "2-----");}
-
-                        Toast.makeText(MainActivity.this, (String) msg.obj,
-                                Toast.LENGTH_SHORT).show();
-
-                    //JSONObject message = new JSONObject(new String(msg.obj));
-                    //int num = message.size();
-                    //String receives[] = msg.obj.toString().split(",");
-
-                    // System.out.println("----"+msg.obj);
-                    //Toast.makeText(MainActivity.this,new String(yy.mPayload),
-                    //Toast.LENGTH_SHORT).show();
-                    System.out.println("-----------------------------");
-                } else if (msg.what == 2) {
-                    Toast.makeText(MainActivity.this, "连接成功", Toast.LENGTH_SHORT).show();
-                    try {
-                        client.subscribe(myTopic, 1);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                } else if (msg.what == 3) {
-                    Toast.makeText(MainActivity.this, "连接失败，系统正在重连", Toast.LENGTH_SHORT).show();
-                }
-            }
-        };
 
         PubButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                publish("djzt","1");
+                publish("djzt", "1");
+            }
+        });
+
+        djqt_sw.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    if (!djzt.equals("1")) {
+                        publish("djzt", "1");
+                    }
+
+                } else {
+                    if (djzt.equals("1")) {
+                        publish("djzt", "0");
+                    }
+
+                }
             }
         });
 
@@ -153,8 +126,8 @@ public class MainActivity extends Activity {
 
             }
 
-              });
-                startReconnect();
+        });
+        startReconnect();
 
 
     }
@@ -170,7 +143,7 @@ public class MainActivity extends Activity {
         djzs_t = findViewById(R.id.djzs_value);
         sbsj_t = findViewById(R.id.sbsj_value);
         djfx_t.setText(djfx);
-        djzt_t.setColorFilter(android.graphics.Color.argb(255,24,241,0));
+        djzt_t.setColorFilter(android.graphics.Color.argb(255, 24, 241, 0));
         sbsj_t.setText(sbsj);
         djfx_t.setText(djfx);
         mToolbar.setNavigationIcon(R.drawable.back);
@@ -229,8 +202,7 @@ public class MainActivity extends Activity {
                 }
 
                 @Override
-                public void messageArrived(String topicName, MqttMessage message)
-                        throws Exception {
+                public void messageArrived(String topicName, MqttMessage message) {
                     //subscribe后得到的消息会执行到这里面
                     System.out.println("messageArrived----------");
                     Message msg = new Message();
@@ -249,7 +221,7 @@ public class MainActivity extends Activity {
     }
 
 
-    private void publish(String key,String value) {
+    private void publish(String key, String value) {
         final String pkey = key;
         final String pval = value;
         new Thread(new Runnable() {
@@ -257,15 +229,16 @@ public class MainActivity extends Activity {
             @Override
             public void run() {
                 if (client.isConnected()) {
-                    JSONObject js1 = new JSONObject(new LinkedHashMap());
-                    js1.put("SBBH","TID01I0FA");
-                    js1.put(pkey,pval);
+//                    JSONObject js1 = new JSONObject(new LinkedHashMap());
+                    JSONObject js1 = new JSONObject(true);
+                    js1.put("SBBH", "TID01I0FA");
+                    js1.put(pkey, pval);
                     //js1.put("SBAL", "1");
-                    js1.put("sbsj","20180412092559");
-                    js1.put("djzs","300");
+                    js1.put("sbsj", "20180412092559");
+                    js1.put("djzs", "300");
                     //js1.put("djfx","NSW");
                     //js1.put("djzt","1");
-                    System.out.println(new String(js1.toJSONString()));
+                    System.out.println(js1.toJSONString());
                     MqttPacketModel testpacket = MqttMsgHeader.MqttMsgHeaderMake("WJ/V1/GAT/TCP/R/J/CT/TID01I0FA", js1.toJSONString().getBytes(), false);
                     //System.out.println(new String(testpacket.mPayload));
                     Log.i(TAG, "testlog" + new String(testpacket.mPayload));
@@ -323,5 +296,133 @@ public class MainActivity extends Activity {
         } catch (MqttException e) {
             e.printStackTrace();
         }
+    }
+
+    private enum HandlerMessage {
+        RECEIVED_MESSAGE(1, "收到信息"),
+        ACCESS_SUCCESS(2, "成功连接到服务器"),
+        ACCESS_FAULT(3, "无法连接到服务器");
+        private int code;
+        private String description;
+
+        HandlerMessage(int code, String description) {
+            this.code = code;
+            this.description = description;
+        }
+
+        public int getCode() {
+            return this.code;
+        }
+
+        public String getDescription() {
+            return this.description;
+        }
+    }
+
+    static class MyHandler extends Handler {
+        private WeakReference<MainActivity> mActivity;//对共有类的弱保持
+
+        private MyHandler(MainActivity activity) {
+            mActivity = new WeakReference<>(activity);
+        }
+
+        @Override
+        public void handleMessage(Message msg) {
+            MainActivity activity = mActivity.get();
+            if (activity == null) {
+                return;
+            }
+            if (msg.what == HandlerMessage.RECEIVED_MESSAGE.getCode()) {
+                JSONObject message = JSON.parseObject((String) msg.obj);
+                try {
+                    if (message != null) {
+                        activity.sbsj = message.getString("sbsj");
+                        activity.djzs = message.getString("djzs");
+                        activity.djfx = message.getString("djfx");
+                        activity.djzt = message.getString("djzt");
+                        activity.djkz = message.getString("djkz");
+                        if (activity.sbsj != null) {
+                            activity.sbsj = activity.sbsj.substring(0, 4) + "年" + activity.sbsj.substring(4, 6) + "月" + activity.sbsj.substring(6, 8) + "日"
+                                    + activity.sbsj.substring(8, 10) + "时" + activity.sbsj.substring(10, 12) + "分" + activity.sbsj.substring(12, 14) + "秒";
+                            activity.sbsj_t.setText(activity.sbsj);
+                        }
+                        if("1".equals(activity.djzt)){
+                            try {
+                                //报警开始
+                                OkGo.get("http://gateserver01.irricontro.com:8088/sanji/alertor/start.do?alertorId=TID01I0FA").execute();
+                                //报警结束
+                                OkGo.get("http://gateserver01.irricontro.com:8088/sanji/alertor/end.do?alertorId=TID01I0FA").execute();
+                                //历史信息
+                                OkGo.<String>get("http://gateserver01.irricontro.com:8088/sanji/alertor/history.do?alertorId=TID01I0FA&size=10&page=1").execute(new StringCallback() {
+                                    @Override
+                                    public void onSuccess(Response<String> response) {
+                                        JSONObject data = JSON.parseObject(response.body());
+                                    }
+                                });
+                            }catch (Exception e){
+
+                            }
+
+                        }
+
+                    }
+                    if (activity.djzs != null) {
+                        activity.djzs_t.setText(activity.djzs);
+                    }
+
+
+                    if (activity.djfx != null) {
+                        if (activity.djfx.equals("CW")) {
+                            activity.djfx = "逆时针";
+                            System.out.println("逆时针");
+                        } else {
+                            activity.djfx = "顺时针";
+                            System.out.println("顺时针");
+                        }
+                        activity.djfx_t.setText(activity.djfx);
+                    }
+                    if (activity.djzt.equals("1")) {
+                        activity.djzt_t.setBackgroundResource(R.drawable.circle_green);
+                        activity.djqt_sw.setChecked(true);
+                    } else {
+                        activity.djzt_t.setBackgroundResource(R.drawable.circle_red);
+                        activity.djqt_sw.setChecked(false);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+//                    String message = (String) msg.obj;
+//                    MqttPacketModel xxs = MqttMsgHeader.MqttMsgHeaderPasre(myTopic, message.getBytes());
+//                    String receive = new String(xxs.mPayload);
+//                    if (xxs != null) {
+//                        msg.obj = new String(xxs.mPayload);
+//                        System.out.println(msg.obj + "2-----");}
+
+                Toast.makeText(activity.getApplicationContext(), (String) msg.obj, Toast.LENGTH_SHORT).show();
+
+                //JSONObject message = new JSONObject(new String(msg.obj));
+                //int num = message.size();
+                //String receives[] = msg.obj.toString().split(",");
+
+                // System.out.println("----"+msg.obj);
+                //Toast.makeText(MainActivity.this,new String(yy.mPayload),
+                //Toast.LENGTH_SHORT).show();
+                System.out.println("-----------------------------");
+            } else if (msg.what == HandlerMessage.ACCESS_SUCCESS.getCode()) {
+                Toast.makeText(activity.getApplicationContext(), "连接成功", Toast.LENGTH_SHORT).show();
+                try {
+                    activity.client.subscribe(activity.myTopic, 1);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            } else if (msg.what == HandlerMessage.ACCESS_FAULT.getCode()) {
+                Toast.makeText(activity.getApplicationContext(), "连接失败，系统正在重连", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    public void history(View view){
+        Intent intent = new Intent();
+        intent.setClass(getApplicationContext(),HistoryActivity.class);
+        startActivity(intent);
     }
 }
